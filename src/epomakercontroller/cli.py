@@ -249,6 +249,30 @@ def set_keys() -> None:
     root.protocol("WM_DELETE_WINDOW", on_close)
     root.mainloop()
 
+@cli.command()
+@click.argument("key_index", type=int)
+@click.argument("r", type=int)
+@click.argument("g", type=int)
+@click.argument("b", type=int)
+def set_key_map(key_index: int, r: int, g: int, b: int) -> None:
+    """"""  # TODO
+    controller = EpomakerController(CONFIGS[ConfigType.CONF_MAIN], dry_run=False)
+    if controller.open_device():
+        for k in range(35, 100):
+            key_index = k
+            key_bytes = "00" * 392
+            rgb = f"{r:02x}{g:02x}{b:02x}"
+            key_bytes = (
+                key_bytes[:3 * 2 * key_index] +
+                rgb +
+                key_bytes[3 * 2 * key_index + 6:]
+            )
+            for i in range(7):
+                controller.send_key_map(i, key_bytes[112*i:112*(i+1)])
+            print(f"{k=}")
+            input("")
+    controller.close_device()
+
 
 if __name__ == "__main__":
     cli()

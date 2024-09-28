@@ -23,6 +23,7 @@ from .commands import (
     EpomakerTempCommand,
     EpomakerCpuCommand,
     EpomakerKeyRGBCommand,
+    EpomakerKeyMapCommand,
 )
 from .commands.data.constants import BUFF_LENGTH
 from .configs.configs import Config
@@ -264,6 +265,7 @@ class EpomakerController:
     def _select_device_path(self, hid_infos: list[HIDInfo]) -> Optional[bytes]:
         """Select the appropriate device path based on interface preference."""
         device_name_filter = "Wireless" if self.use_wireless else "Wired"
+        device_name_filter = ""
         filtered_devices = [h for h in hid_infos if device_name_filter in h.device_name]
 
         if not filtered_devices:
@@ -378,6 +380,13 @@ class EpomakerController:
         """
         rgb_command = EpomakerKeyRGBCommand.EpomakerKeyRGBCommand(frames)
         self._send_command(rgb_command)
+
+    def send_key_map(self, page: int, key_bytes: str) -> None:
+        key_map_command = EpomakerKeyMapCommand.EpomakerKeyMapCommand(
+            page,
+            key_bytes,
+        )
+        self._send_command(key_map_command)
 
     def close_device(self) -> None:
         """Closes the USB HID device."""
